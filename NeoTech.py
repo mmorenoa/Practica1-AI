@@ -27,7 +27,7 @@ proxy = Proxy({
     'noProxy': ''})
 options.proxy = proxy
 
-
+result = []
 def extract (n, fecha,numEnlace):
     patron = 'pp. C.-C.'
     i = 0
@@ -64,7 +64,9 @@ def extract (n, fecha,numEnlace):
             print("\nTITULO: ", titulo.text)
             print("\nFECHA: ", date_object.strftime(date_format))
             print("\nABSTRACT: ", abstract.text)
-            print("\nKEYWORDS: ", keyList[1::]) 
+            print("\nKEYWORDS: ", keyList[1::])
+            info = (titulo.text, date_object.strftime(date_format), abstract.text, keyList[1::]) 
+            result.append(info)
             i+=1
             driver.quit()
         if(i==tituloLength): 
@@ -90,5 +92,5 @@ def formateoFecha (md):
 
 
 extract(17, datetime(2006, 3, 1),0) #Hay 14 en febrero, asi que coge 2 de marzo
-
-
+print("--------resultado------")
+print(result)
