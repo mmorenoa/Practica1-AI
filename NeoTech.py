@@ -33,7 +33,7 @@ def extract (n, fecha,numEnlace):
     i = 0
     if (fecha == None):
         fecha = datetime.now()
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options, chrome_options=chrome_options)
     month = fecha.strftime("%m")
     year = fecha.strftime("%Y")
     driver.get("https://www.computer.org/csdl/journal/tp/"+year+"/"+month)
@@ -43,7 +43,7 @@ def extract (n, fecha,numEnlace):
     print("Numero articulos = " + str(tituloLength))
     for item in titulo:
         enlaces = item.get_attribute("href")
-        driver = webdriver.Chrome(ChromeDriverManager().install())
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options, chrome_options=chrome_options)
         driver.get(enlaces)
         time.sleep(2)
         titulo = driver.find_element(By.CLASS_NAME, 'article-title')
