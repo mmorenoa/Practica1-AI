@@ -5,6 +5,7 @@ Para funcionar, el script requiere que estén instalada la
 biblioteca `selenium`. """
 
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import re
@@ -12,10 +13,11 @@ from datetime import datetime
 import pandas as pd
 from selenium.webdriver.common.proxy import *
 import time
+from dateutil.relativedelta import relativedelta
 
 options = Options()
 options.headless = True
-chrome_options = webdriver.ChromeOptions()
+chrome_options = webdriver.Chrome(ChromeDriverManager().install()).create_options()
 chrome_options.add_argument('--blink-settings=imagesEnabled=false')
 myProxy = "185.238.228.67:80"
 proxy = Proxy({
@@ -26,27 +28,29 @@ proxy = Proxy({
 options.proxy = proxy
 
 
-def extract (n, fecha, numEnlace):
+def extract (n, fecha,numEnlace):
     patron = 'pp. C.-C.'
     i = 0
     if (fecha == None):
         fecha = datetime.now()
-    driver = webdriver.Chrome(options=options, chrome_options=chrome_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install())
     month = fecha.strftime("%m")
     year = fecha.strftime("%Y")
     driver.get("https://www.computer.org/csdl/journal/tp/"+year+"/"+month)
     time.sleep(2)
     titulo = driver.find_elements(By.CLASS_NAME, "article-title")
-    length = len(titulo)
-    print("Numero articulos = " + str(length))
+    tituloLength = len(titulo)
+    print("Numero articulos = " + str(tituloLength))
     for item in titulo:
         enlaces = item.get_attribute("href")
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(ChromeDriverManager().install())
         driver.get(enlaces)
+        time.sleep(2)
         titulo = driver.find_element(By.CLASS_NAME, 'article-title')
         metadatos = driver.find_element(By.CLASS_NAME, 'article-metadata')
         keywords = driver.find_element(By.TAG_NAME, 'csdl-article-keywords')
         keyString = keywords.text
+        numEnlace += 1
         keyList = keyString.split(",")
         abstract = driver.find_element(By.TAG_NAME, 'article')
         date_object = formateoFecha(metadatos.text)
@@ -57,17 +61,16 @@ def extract (n, fecha, numEnlace):
             print("\n----------")
             print(numEnlace, " enlace: ", enlaces)
             print("----------")
-            numEnlace += 1
             print("\nTITULO: ", titulo.text)
             print("\nFECHA: ", date_object.strftime(date_format))
             print("\nABSTRACT: ", abstract.text)
             print("\nKEYWORDS: ", keyList[1::]) 
             i+=1
             driver.quit()
-        if(i==length): 
-            new_date = pd.to_datetime(fecha)+pd.DateOffset(months=1)
+        if(i==tituloLength): 
+            new_date = pd.to_datetime(fecha)-relativedelta(months=1)
             print("newdate: ", str(new_date))
-            extract(n-i, new_date, numEnlace)
+            extract(n-i, new_date,numEnlace)
         elif i==(n): break
     
 
@@ -86,7 +89,6 @@ def formateoFecha (md):
     return date_object
 
 
-extract(16, datetime(2006, 2, 1), 1) #Hay 14 en febrero, asi que coge 2 de marzo
-extract(2, None, 1)
+extract(17, datetime(2006, 3, 1),0) #Hay 14 en febrero, asi que coge 2 de marzo
 
 
