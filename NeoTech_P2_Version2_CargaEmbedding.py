@@ -47,12 +47,12 @@ print(f'done ({len(word2vec)} word vectors loaded)')
 print("\n")
 
 
-#Esto ha sido modificado no se si está bien lode las keywords
+#Esto ha sido modificado no se si está bien lode las keywords CORREGIR
 print('Loading absract training dataset... ', end='')
 df = pd.read_csv('Desktop/AI/papers.csv') # Modificar al vuestro
 abstracts = df['abstract'].values
 keywords = df['keywords'].apply(lambda x: x.split(','))  
-keywords = keywords.apply(lambda x: [' '.join(x)]) # une las palabras con espacios
+targets = keywords.apply(lambda x: [' '.join(x)]) # une las palabras con espacios
 # df['top_keywords'] = df[['keyword1'. 'keyword2', 'keyword3', 'keyword4', 'keyword5']].apply(extract_keywords, axis=1)      
 print(f'done ({len(abstracts)} articulos loaded)')
 print(f'Biggest abstracgt length:  {max(len(s) for s in abstracts)}')
@@ -106,3 +106,48 @@ print("\n")
 
 
 #----------------------------------------------------------------------------------------------------------------
+
+
+input_ = tf.keras.layers.Input(shape=(MAX_SEQUENCE_LENGTH,)) 
+x = embedding_layer(input_) 
+x = tf.keras.layers.Conv1D(16, kernel_size=3, activation='relu')(x) 
+x = tf.keras.layers.MaxPooling1D(pool_size=2)(x) 
+x = tf.keras.layers.Conv1D(32, kernel_size=3, activation='relu')(x) 
+x = tf.keras.layers.MaxPooling1D(pool_size=2)(x) 
+x = tf.keras.layers.Conv1D(64, kernel_size=3, activation='relu')(x) 
+x = tf.keras.layers.MaxPooling1D(pool_size=2)(x) 
+x = tf.keras.layers.Flatten()(x) 
+x = tf.keras.layers.Dense(128, activation='relu')(x) 
+output = tf.keras.layers.Dense(5, activation='softmax')(x)  # 5 jeywords
+ 
+model = tf.keras.Model(input_, output) 
+model.compile( 
+  loss='categorical_crossentropy', 
+  optimizer='adam', 
+  metrics=['accuracy'], 
+) 
+model.summary() 
+ 
+history = model.fit(data, targets, epochs=10, validation_split=0.1, batch_size=4096)
+
+
+# Probamos
+plt.subplot(1, 2, 1) 
+plt.plot(history.history['loss'], label='Training') 
+plt.plot(history.history['val_loss'], label='Validation') 
+plt.xlabel('Epoch') 
+plt.ylabel('Loss') 
+plt.title(f'Training: {history.history["loss"][-1]:.2f}, validation: {history.history["val_loss"][-1]:.2f}') 
+plt.legend() 
+ 
+plt.subplot(1, 2, 2) 
+plt.plot(history.history['binary_accuracy'], label='Training') 
+plt.plot(history.history['val_binary_accuracy'], label='Validation') 
+plt.xlabel('Epoch') 
+plt.ylabel('Accuracy') 
+plt.title(f'Training: {history.history["binary_accuracy"][-1]:.2f}, validation: {history.history["val_binary_accuracy"][-1]:.2f}') 
+plt.legend() 
+ 
+plt.tight_layout() 
+plt.show()
+
