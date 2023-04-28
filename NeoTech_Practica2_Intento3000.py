@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from array import array
 
 plt.style.use('ggplot')
 plt.rcParams.update({'figure.figsize': (20, 6),'figure.dpi': 64})
@@ -58,22 +59,26 @@ abstracts = df['abstract'].values
 
 
 # HACER LO DE LAS KEYWORDS
-keywords = ["Hola que tal", "me llamo", "Sofia"] #keywords = df['keywords'].values
-combined_keywords = " ".join(keywords)
+keywords = ["hola que tal", "me llamo", "sofia", "Sofia"] #keywords = df['keywords'].values
+#combined_keywords = " ".join(keywords)
+keywords.sort()
 print("keywords:", keywords)
 # Eliminar palabras repetidas
 unique_keywords = list(set(keywords))
 # Crear diccionario
 diccionario = {word: i for i, word in enumerate(unique_keywords)}
+print("diccionario: ", diccionario)
 # Crear matriz de ceros
 print("LENGTH",len(keywords))
 print(unique_keywords)
-matrizKeywords = np.zeros((len(keywords), len(unique_keywords)))
+matrizKeywords = np.zeros((len(unique_keywords), len(unique_keywords)))
 # Rellenar matriz 
 for i, word in enumerate(unique_keywords):
-    for token in word.split():
+    for token in word.split(","):
         matrizKeywords[i][diccionario[token]] = 1
 print(matrizKeywords.astype(int).tolist())
+
+
 
 
 
