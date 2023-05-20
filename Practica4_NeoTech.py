@@ -151,6 +151,7 @@ plt.ylabel('Mejor Fitness')
 plt.title('Evolución del Mejor Fitness')
 plt.show()
 
+# TERMINAR ESTAPARTE PARA QUE IMPRIMa ALS COSAS Y TAL
 
 
 
